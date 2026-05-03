@@ -24,19 +24,17 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
-# ── CSV paths (written by data_cleaning.py) ────────────────────────────────────
+# CSV paths (written by data_cleaning.py)
 DATA_DIR     = os.path.join(os.path.dirname(__file__), "data")
 MATCHES_CSV  = os.path.join(DATA_DIR, "matches_clean.csv")
 
-# ── Feature set ───────────────────────────────────────────────────────────────
+# Feature set
 MATCH_FEATURES = ["exp_home_goals", "exp_away_goals"]
 
 OUTCOME_LABELS = {0: "Home Win", 1: "Draw", 2: "Away Win"}
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# MODEL — LINEAR REGRESSION
-# ═══════════════════════════════════════════════════════════════════════════════
+# MODEL: LINEAR REGRESSION
 
 class LinearRegressionGoals:
     """
@@ -77,7 +75,7 @@ class LinearRegressionGoals:
 
         X = df[MATCH_FEATURES]
 
-        # ── Train/test split (same split for both targets) ────────────────────
+        # Train/test split (same split for both targets)
         X_train, X_test, idx_train, idx_test = train_test_split(
             X, X.index, test_size=0.2, random_state=42
         )
@@ -86,21 +84,21 @@ class LinearRegressionGoals:
         y_away_train = df.loc[idx_train, "away_score"]
         y_away_test  = df.loc[idx_test,  "away_score"]
 
-        # ── Fit home goals model ───────────────────────────────────────────────
+        # Fit home goals model
         self.home_model = LinearRegression()
         self.home_model.fit(X_train, y_home_train)
         home_pred  = self.home_model.predict(X_test)
         home_r2    = r2_score(y_home_test, home_pred)
         home_rmse  = mean_squared_error(y_home_test, home_pred) ** 0.5
 
-        # ── Fit away goals model ───────────────────────────────────────────────
+        # Fit away goals model
         self.away_model = LinearRegression()
         self.away_model.fit(X_train, y_away_train)
         away_pred  = self.away_model.predict(X_test)
         away_r2    = r2_score(y_away_test, away_pred)
         away_rmse  = mean_squared_error(y_away_test, away_pred) ** 0.5
 
-        # ── Winner accuracy from predicted scores ──────────────────────────────
+        # Winner accuracy from predicted scores
         pred_outcome  = self._scores_to_outcome(home_pred, away_pred)
         true_outcome  = df.loc[idx_test, "outcome"].values
         winner_acc    = (pred_outcome == true_outcome).mean()
@@ -203,9 +201,7 @@ class LinearRegressionGoals:
         return np.where(diff > 0.15, 0, np.where(diff < -0.15, 2, 1))
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # CONVENIENCE WRAPPER
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class RegressionModels:
     """
@@ -240,7 +236,7 @@ class RegressionModels:
         return {"linear_regression": self.lr.metrics}
 
 
-# ── Standalone run ─────────────────────────────────────────────────────────────
+# Standalone run
 if __name__ == "__main__":
     if not os.path.exists(MATCHES_CSV):
         print("ERROR: data/matches_clean.csv not found.")

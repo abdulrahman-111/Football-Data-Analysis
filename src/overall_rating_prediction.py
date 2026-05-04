@@ -17,7 +17,7 @@ print(f"*************** Loading data from {filename} ***************")
 df_model = pd.read_csv(filename)
 
 print('\n*************** Regression Model Comparison ***************')
-X_reg = df_model.drop(columns=['overall_rating', 'best_position'])
+X_reg = df_model.drop(columns=['overall_rating', 'best_position', 'name'])
 y_reg = df_model['overall_rating']
 
 X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(X_reg, y_reg, test_size=0.2, random_state=42)

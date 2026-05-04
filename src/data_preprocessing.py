@@ -20,7 +20,7 @@ print()
 # This automatically drops URLs, images, descriptions, and leakage positions
 print('*************** Selecting Relevant Features *******************')
 columns_to_keep = [
-    'best_position', 'overall_rating', 'preferred_foot', 'height_cm', 'weight_kg', 
+    'name', 'best_position', 'overall_rating', 'preferred_foot', 'height_cm', 'weight_kg', 
     'weak_foot', 'skill_moves', 'crossing', 'finishing', 'heading_accuracy', 
     'short_passing', 'volleys', 'dribbling', 'curve', 'fk_accuracy', 'long_passing', 
     'ball_control', 'acceleration', 'sprint_speed', 'agility', 'reactions', 

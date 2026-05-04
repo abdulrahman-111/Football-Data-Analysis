@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import joblib
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression, Ridge
@@ -26,9 +26,21 @@ scaler_r = StandardScaler()
 X_train_r_scaled = scaler_r.fit_transform(X_train_r)
 X_test_r_scaled = scaler_r.transform(X_test_r)
 
+print('\n*************** Ridge Regression Alpha Tuning (5-Fold CV) ***************')
+ridge_params = {'alpha': [0.1, 1.0, 10.0]}
+ridge_grid = GridSearchCV(Ridge(), ridge_params, cv=5, scoring='r2')
+ridge_grid.fit(X_train_r_scaled, y_train_r)
+best_alpha = ridge_grid.best_params_['alpha']
+
+print("CV Results for Ridge Regression:")
+for i in range(len(ridge_params['alpha'])):
+    print(f"Alpha: {ridge_grid.cv_results_['param_alpha'][i]} -> Mean CV R-squared: {ridge_grid.cv_results_['mean_test_score'][i]:.4f}")
+print(f"Selected best Alpha: {best_alpha}")
+
+print('\n*************** Final Regression Model Comparison ***************')
 regression_models = {
     "Linear Regression": LinearRegression(),
-    "Ridge Regression": Ridge(alpha=10.0),
+    f"Ridge Regression (alpha={best_alpha})": ridge_grid.best_estimator_,
     "Polynomial Regression (Degree 2)": make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
 }
 

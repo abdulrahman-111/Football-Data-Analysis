@@ -74,7 +74,7 @@ print(team_mean)
 df_cleaned = df.drop(columns=["name",'player','team','position'], axis=1)
 
 
-# standarize output  
+# standarize featuers  
 
 features = df_cleaned.drop(columns=['current_value'])
 
@@ -179,6 +179,3 @@ joblib.dump(team_mean, encoding_path)
 
 out_dataset_path = os.path.join(BASE_DIR, "data","processed"," transfer_value_prediction_processed_dataset.csv")
 df_final.to_csv(out_dataset_path, index=False)
-
-out_dataset_path = os.path.join(BASE_DIR, "data","processed",'dataset_without_name_position_team_player.csv')
-df_cleaned.to_csv(out_dataset_path , index=False)

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 
@@ -23,6 +24,11 @@ features_scaled = scaler.fit_transform(features)
 # Euclidean distance measures the absolute straight-line distance between player profiles
 nn_model = NearestNeighbors(n_neighbors=6, metric='euclidean', algorithm='brute')
 nn_model.fit(features_scaled)
+
+# Save the model and scaler together so they can be loaded in the future
+model_path = os.path.join(project_root, 'models', 'player_recommender.pkl')
+joblib.dump({'model': nn_model, 'scaler': scaler}, model_path)
+print(f"Saved Recommender Model and Scaler to {model_path}")
 
 def recommend_player(player_name, top_n=5):
     # Find the player in the dataset
@@ -53,7 +59,7 @@ def recommend_player(player_name, top_n=5):
         print(f"{i}. {safe_match_name} (Distance Score: {match_dist:.2f} | Overall: {match_player['overall_rating']} | Position: {match_player['best_position']})")
 
 if __name__ == "__main__":
-    # Test the recommender!
+    # Testing the model
     recommend_player("Kevin De Bruyne")
     print("-" * 50)
     recommend_player("Rodri")

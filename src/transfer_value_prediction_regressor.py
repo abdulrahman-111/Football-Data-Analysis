@@ -105,6 +105,7 @@ threshold = .05
 corr = modified_df.corr()['current_value']
 
 
+print(f"SELECTING these features: {corr[abs(corr)>threshold].index}")
 
 features_less_than_threshold = corr[abs(corr)<threshold].index
 

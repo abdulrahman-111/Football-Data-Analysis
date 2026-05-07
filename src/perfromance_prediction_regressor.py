@@ -72,7 +72,8 @@ for target in targets_index :
 
     ## feature Selection  
     top_features = corr.abs().sort_values(ascending=False).head(25).index
-    
+    print(f"{target}: selected_ features : {top_features}")
+
 
     corr_with_top = modified_df[top_features].corr()[target].abs().sort_values(ascending=False)
 

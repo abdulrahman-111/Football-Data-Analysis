@@ -9,7 +9,7 @@ import os
 
 from sklearn.preprocessing import StandardScaler ,MinMaxScaler
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline 
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LogisticRegression
@@ -115,7 +115,14 @@ ax.fill(angles, values, alpha=0.3)
 ax.set_xticks(angles[:-1])
 ax.set_xticklabels(labels, fontsize=9)
 ax.set_title("Best Player Overall Stats (Radar Chart)", fontsize=14, pad=20)
+
+image_path= os.path.join(BASE_DIR, "outputs","injury_radar.png")
+
+plt.savefig(image_path, dpi=300, bbox_inches='tight')
+
 plt.show()
+
+plt.close()
 
 #model 
 
@@ -129,17 +136,39 @@ pipeline = Pipeline([
 
     ('model', LogisticRegression(
         max_iter=10000,
-        class_weight='balanced',  # important for injuries
-        C= 0.1
     ))
 ])
 
-pipeline.fit(X_train, y_train)
+param_grid = {
+    'model__C': [0.01, 0.1, 1, 10],        # regularization strength
+    'model__penalty': ['l2'],              # keep it simple
+    'model__class_weight': [None, 'balanced']
+}
 
-preds = pipeline.predict(X_test)
 
-train_acc = pipeline.score(X_train, y_train)
-test_acc = pipeline.score(X_test, y_test)
+# Grid Search with CV
+grid = GridSearchCV(
+    pipeline,
+    param_grid,
+    cv=5,
+    scoring='f1',   # better for imbalanced data (injuries)
+    n_jobs=-1
+)
+
+
+grid.fit(X_train, y_train)
+
+#   Best model
+best_model = grid.best_estimator_
+
+print("Best Params:", grid.best_params_)
+print("Best CV Score:", grid.best_score_)
+
+# Evaluate
+preds = best_model.predict(X_test)
+
+train_acc = best_model.score(X_train, y_train)
+test_acc = best_model.score(X_test, y_test)
 
 cm = confusion_matrix(y_test, preds)
 
@@ -147,33 +176,25 @@ cm = confusion_matrix(y_test, preds)
 
 labels = ['No Injury', 'Injury']
 
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+plt.figure(figsize=(12, 5))
 
-# --- Heatmap ---
-sns.heatmap(cm, 
-            annot=True, 
-            fmt='d', 
-            cmap='Blues',
-            xticklabels=labels,
-            yticklabels=labels,
-            ax=axes[0])
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=labels
+)
 
-axes[0].set_xlabel("Predicted")
-axes[0].set_ylabel("Actual")
-axes[0].set_title("Confusion Matrix (Heatmap)")
+disp.plot(cmap='Blues', colorbar=False)
 
-
-
-# --- Sklearn ConfusionMatrixDisplay ---
-
-
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-disp.plot(cmap='Blues', ax=axes[1], colorbar=False)
-
-axes[1].set_title("Confusion Matrix (Sklearn)")
-
+plt.title("Confusion Matrix (Sklearn)")
 plt.tight_layout()
+
+# Save figure
+image_path = os.path.join(BASE_DIR, "outputs", "Injury_classifier_CM.png")
+plt.savefig(image_path, dpi=300, bbox_inches='tight')
+
 plt.show()
+
+plt.close()
 
 # --- Metrics ---
 print(f"Train Accuracy: {train_acc:.4f}")
@@ -183,6 +204,9 @@ print("\n--- Classification Report ---")
 print(classification_report(y_test, preds , target_names=labels))
 
 
+
+
+## DONE -> PREPROCESSING + CLEANING + SOME INSIGHTS IN DATA TO SELECT BEST MODEL + TRAINED MODEL 
 
 
 

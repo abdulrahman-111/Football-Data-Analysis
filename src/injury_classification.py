@@ -80,49 +80,7 @@ plt.close()
 
 
 
-stats_cols = [
-    'Age', 'Height_cm', 'Weight_kg', 'Training_Hours_Per_Week',
-    'Matches_Played_Past_Season', 'Previous_Injury_Count',
-    'Knee_Strength_Score', 'Hamstring_Flexibility', 'Reaction_Time_ms',
-    'Balance_Test_Score', 'Sprint_Speed_10m_s', 'Agility_Score',
-    'Sleep_Hours_Per_Night', 'Stress_Level_Score', 'Nutrition_Quality_Score',
-    'Warmup_Routine_Adherence', 'BMI'
-]
 
-scaler = MinMaxScaler()
-df_scaled = pd.DataFrame(scaler.fit_transform(df[stats_cols]), columns=stats_cols)
-
-df['Overall_Score'] = df_scaled.mean(axis=1)
-best_player_idx = df['Overall_Score'].idxmax()
-best_player = df.loc[best_player_idx]
-
-print("Best player details:")
-print(best_player)
-
-player_stats = df_scaled.loc[best_player_idx]
-
-labels = stats_cols
-values = player_stats.values
-angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False).tolist()
-values = np.concatenate((values, [values[0]]))
-angles += angles[:1]
-
-plt.figure(figsize=(8, 8))
-ax = plt.subplot(111, polar=True)
-ax.plot(angles, values, linewidth=2, linestyle='solid')
-ax.fill(angles, values, alpha=0.3)
-
-ax.set_xticks(angles[:-1])
-ax.set_xticklabels(labels, fontsize=9)
-ax.set_title("Best Player Overall Stats (Radar Chart)", fontsize=14, pad=20)
-
-image_path= os.path.join(BASE_DIR, "outputs","injury_radar.png")
-
-plt.savefig(image_path, dpi=300, bbox_inches='tight')
-
-plt.show()
-
-plt.close()
 
 #model 
 
@@ -214,6 +172,50 @@ out_dataset_path = os.path.join(BASE_DIR, "data","processed","Injury_prediction_
 df.to_csv(out_dataset_path, index=False)
 
 model_path = os.path.join(BASE_DIR, "models","Injury_classifier_model.pkl")
-joblib.dump(pipeline, model_path)
+joblib.dump(best_model, model_path)
+
+stats_cols = [
+    'Age', 'Height_cm', 'Weight_kg', 'Training_Hours_Per_Week',
+    'Matches_Played_Past_Season', 'Previous_Injury_Count',
+    'Knee_Strength_Score', 'Hamstring_Flexibility', 'Reaction_Time_ms',
+    'Balance_Test_Score', 'Sprint_Speed_10m_s', 'Agility_Score',
+    'Sleep_Hours_Per_Night', 'Stress_Level_Score', 'Nutrition_Quality_Score',
+    'Warmup_Routine_Adherence', 'BMI'
+]
+
+scaler = MinMaxScaler()
+df_scaled = pd.DataFrame(scaler.fit_transform(df[stats_cols]), columns=stats_cols)
+
+df['Overall_Score'] = df_scaled.mean(axis=1)
+best_player_idx = df['Overall_Score'].idxmax()
+best_player = df.loc[best_player_idx]
+
+print("Best player details:")
+print(best_player)
+
+player_stats = df_scaled.loc[best_player_idx]
+
+labels = stats_cols
+values = player_stats.values
+angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False).tolist()
+values = np.concatenate((values, [values[0]]))
+angles += angles[:1]
+
+plt.figure(figsize=(8, 8))
+ax = plt.subplot(111, polar=True)
+ax.plot(angles, values, linewidth=2, linestyle='solid')
+ax.fill(angles, values, alpha=0.3)
+
+ax.set_xticks(angles[:-1])
+ax.set_xticklabels(labels, fontsize=9)
+ax.set_title("Best Player Overall Stats (Radar Chart)", fontsize=14, pad=20)
+
+image_path= os.path.join(BASE_DIR, "outputs","injury_radar.png")
+
+plt.savefig(image_path, dpi=300, bbox_inches='tight')
+
+plt.show()
+
+plt.close()
 
 

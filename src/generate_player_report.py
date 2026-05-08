@@ -1,14 +1,3 @@
-"""
-generate_player_report.py
-─────────────────────────
-Loads pre-trained models, runs inference from a JSON input file,
-and produces a professional Word (.docx) scouting report.
-
-Usage:
-    python generate_player_report.py --input player_input.json \
-                                     --output player_report.docx \
-                                     --models_dir models/
-"""
 
 import argparse
 import json
@@ -43,6 +32,7 @@ ACCENT_HEX = "1A78C2"
 # ─────────────────────────────────────────────────────────────────
 # XML HELPERS
 # ─────────────────────────────────────────────────────────────────
+
 def set_cell_bg(cell, hex_color):
     tc   = cell._tc
     tcPr = tc.get_or_add_tcPr()
@@ -79,6 +69,7 @@ def set_para_border_bottom(para, color="1A78C2", size=12):
 # ─────────────────────────────────────────────────────────────────
 # SCORING LOGIC  (heuristic thresholds – replace with your own)
 # ─────────────────────────────────────────────────────────────────
+
 def score_goals(predicted_goals):
     """Return (score 0-10, label, colour_hex)"""
     if predicted_goals >= 18:   return 9.5, "Elite",       "1A9641"
@@ -120,6 +111,7 @@ def overall_recommendation(scores):
 # ─────────────────────────────────────────────────────────────────
 # MODEL INFERENCE
 # ─────────────────────────────────────────────────────────────────
+
 GOALS_FEATURES = [
     'Expected_xG','Expected_npxG','Standard_Gls','Performance_Gls',
     'Standard_SoT','Expected_npxG+xAG','Touches_Att Pen','Performance_G-PK',

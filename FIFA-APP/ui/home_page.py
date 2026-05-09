@@ -262,6 +262,6 @@ class HomePage(QWidget):
                 }}
                 QPushButton:hover {{ background: {color}; color: #0A0E1A; }}
             """)
-            btn.clicked.connect(lambda _, p=page: self._switch(p))
+            btn.clicked.connect(lambda checked=False, p=page: self._switch(p))
             lay.addWidget(btn)
         return w

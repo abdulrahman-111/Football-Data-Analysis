@@ -23,9 +23,12 @@ warnings.filterwarnings("ignore")
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
+import joblib
 
-# CSV paths (written by data_cleaning.py)
-DATA_DIR     = os.path.join(os.path.dirname(__file__), "data")
+# Base directory and paths
+BASE_DIR     = os.path.dirname(__file__)
+DATA_DIR     = os.path.join(BASE_DIR, "data", "processed")
+MODELS_DIR   = os.path.join(BASE_DIR, "models")
 MATCHES_CSV  = os.path.join(DATA_DIR, "matches_clean.csv")
 
 # Feature set
@@ -143,6 +146,13 @@ class LinearRegressionGoals:
 
             print(f"\n  Winner prediction accuracy (test data): {winner_acc*100:.1f}%")
             print(f"  Train samples: {len(X_train)}  |  Test samples: {len(X_test)}")
+
+        # Save trained model to pkl
+        os.makedirs(MODELS_DIR, exist_ok=True)
+        model_path = os.path.join(BASE_DIR, "models", "linear_regression.pkl")
+        joblib.dump(self, model_path)
+        if verbose:
+            print(f"\n  Model saved to {model_path}")
 
         return self
 

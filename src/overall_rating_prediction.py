@@ -39,9 +39,9 @@ print(f"Selected best Alpha: {best_alpha}")
 
 print('\n*************** Final Regression Model Comparison ***************')
 regression_models = {
-    "Linear Regression": LinearRegression(),
-    f"Ridge Regression (alpha={best_alpha})": ridge_grid.best_estimator_,
-    "Polynomial Regression (Degree 2)": make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
+    "Linear Regression": make_pipeline(StandardScaler(), LinearRegression()),
+    f"Ridge Regression (alpha={best_alpha})": make_pipeline(StandardScaler(), Ridge(alpha=best_alpha)),
+    "Polynomial Regression (Degree 2)": make_pipeline(StandardScaler(), PolynomialFeatures(degree=2), LinearRegression())
 }
 
 best_reg_r2 = -float('inf')
@@ -49,8 +49,9 @@ best_reg_name = ""
 best_reg_model_obj = None
 
 for name, model in regression_models.items():
-    model.fit(X_train_r_scaled, y_train_r)
-    y_pred = model.predict(X_test_r_scaled)
+    # FIT ON RAW X_train_r! The pipeline handles the scaling automatically!
+    model.fit(X_train_r, y_train_r)
+    y_pred = model.predict(X_test_r)
     r2 = r2_score(y_test_r, y_pred)
     mse = mean_squared_error(y_test_r, y_pred)
     print(f"{name} -> MSE: {mse:.4f} | R-squared: {r2:.4f}")
